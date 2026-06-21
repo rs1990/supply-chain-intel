@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line
 } from "recharts";
-import { api, WeeklyMetric, SupplierPerf, FreightSummary, WarrantySummary } from "../api/client";
+import { api, type WeeklyMetric, type SupplierPerf, type FreightSummary, type WarrantySummary } from "../api/client";
 import { MetricCard } from "../components/MetricCard";
 
 export function Weekly() {

@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine
 } from "recharts";
-import { api, DailyMetric, Anomaly } from "../api/client";
+import { api, type DailyMetric, type Anomaly } from "../api/client";
 import { MetricCard } from "../components/MetricCard";
 import { clsx } from "clsx";
 
