@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SupplyChainIntel: daily KPIs across eight enterprise systems</title>
+<meta name="description" content="A supply chain intelligence platform ingesting from eight enterprise sources to compute daily KPIs, weekly aggregates, warranty anomaly detection, and 14-day demand forecasts.">
+<meta property="og:title" content="SupplyChainIntel: daily KPIs across eight enterprise systems">
+<meta property="og:description" content="A supply chain intelligence platform ingesting from eight enterprise sources to compute daily KPIs, weekly aggregates, warranty anomaly detection, and 14-day demand forecasts.">
+<meta property="og:type" content="website">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%23b45309'/><text x='50' y='68' font-size='56' font-family='Helvetica,Arial' font-weight='700' fill='white' text-anchor='middle'>S</text></svg>">
+<style>
+  :root {
+    --accent: #b45309;
+    --accent-soft: #f7eee1;
+    --bg: #faf9f6;
+    --surface: #ffffff;
+    --border: #e6e2d9;
+    --ink: #1b1a17;
+    --ink-soft: #56534c;
+    --ink-faint: #86827a;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, Roboto, Helvetica, Arial, sans-serif;
+    font-size: 17px;
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+  }
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  .wrap { max-width: 940px; margin: 0 auto; padding: 0 28px; }
+
+  header.site {
+    border-bottom: 1px solid var(--border);
+    background: rgba(250, 249, 246, 0.92);
+    backdrop-filter: saturate(160%) blur(8px);
+    position: sticky; top: 0; z-index: 20;
+  }
+  header.site .wrap {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 20px; height: 64px;
+  }
+  .brand { display: flex; align-items: center; gap: 11px; font-weight: 650; letter-spacing: -0.01em; }
+  .brand .dot { width: 11px; height: 11px; border-radius: 3px; background: var(--accent); }
+  nav.top { display: flex; gap: 22px; font-size: 15px; }
+  nav.top a { color: var(--ink-soft); }
+  nav.top a:hover { color: var(--accent); text-decoration: none; }
+  @media (max-width: 700px) { nav.top a.hide-sm { display: none; } }
+
+  section { padding: 62px 0; border-bottom: 1px solid var(--border); }
+  section:last-of-type { border-bottom: 0; }
+
+  .hero { padding: 82px 0 66px; border-bottom: 1px solid var(--border); }
+  .eyebrow {
+    display: inline-block; font-size: 12.5px; font-weight: 650;
+    letter-spacing: 0.09em; text-transform: uppercase;
+    color: var(--accent); background: var(--accent-soft);
+    padding: 5px 11px; border-radius: 999px; margin-bottom: 22px;
+  }
+  h1 {
+    font-size: clamp(38px, 6.2vw, 60px); line-height: 1.06;
+    letter-spacing: -0.032em; font-weight: 700; margin: 0 0 20px;
+  }
+  .lede { font-size: clamp(18px, 2.4vw, 21px); color: var(--ink-soft); max-width: 44em; margin: 0 0 30px; }
+  .cta { display: flex; flex-wrap: wrap; gap: 12px; }
+  .btn {
+    display: inline-block; padding: 11px 20px; border-radius: 8px;
+    font-size: 15px; font-weight: 600; border: 1px solid var(--accent);
+    background: var(--accent); color: #fff;
+  }
+  .btn:hover { text-decoration: none; opacity: 0.9; }
+  .btn.ghost { background: transparent; color: var(--accent); }
+
+  h2 { font-size: 27px; letter-spacing: -0.022em; font-weight: 680; margin: 0 0 10px; }
+  .sub { color: var(--ink-faint); font-size: 15.5px; margin: 0 0 30px; }
+  h3 { font-size: 17px; font-weight: 650; margin: 0 0 7px; letter-spacing: -0.008em; }
+  p { margin: 0 0 18px; }
+  p.body { max-width: 46em; color: var(--ink-soft); }
+
+  .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 1px; background: var(--border); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; margin-top: 42px; }
+  .stat { background: var(--surface); padding: 22px 20px; }
+  .stat .v { font-size: 26px; font-weight: 700; letter-spacing: -0.025em; color: var(--accent); line-height: 1.15; }
+  .stat .k { font-size: 13.5px; color: var(--ink-faint); margin-top: 5px; }
+
+  .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(268px, 1fr)); gap: 16px; }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 22px; }
+  .card p { margin: 0; font-size: 15.5px; color: var(--ink-soft); line-height: 1.6; }
+  .card .n { font-size: 12px; font-weight: 700; color: var(--accent); letter-spacing: 0.08em; display: block; margin-bottom: 9px; }
+
+  pre.diagram {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 12px;
+    padding: 22px; overflow-x: auto; font-size: 13px; line-height: 1.62;
+    font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+    color: var(--ink-soft); margin: 0;
+  }
+
+  ul.facts { list-style: none; padding: 0; margin: 0; columns: 2; column-gap: 34px; }
+  ul.facts li { break-inside: avoid; padding: 9px 0 9px 20px; position: relative; font-size: 15.5px; color: var(--ink-soft); border-bottom: 1px solid var(--border); }
+  ul.facts li::before { content: ""; position: absolute; left: 0; top: 18px; width: 7px; height: 7px; border-radius: 2px; background: var(--accent); }
+  @media (max-width: 700px) { ul.facts { columns: 1; } }
+
+  .stack { display: flex; flex-wrap: wrap; gap: 8px; }
+  .chip { font-size: 13.5px; padding: 6px 12px; border-radius: 999px; background: var(--surface); border: 1px solid var(--border); color: var(--ink-soft); }
+
+  .note { background: var(--surface); border: 1px solid var(--border); border-left: 3px solid var(--accent); border-radius: 10px; padding: 22px 24px; }
+  .note p { margin: 0; color: var(--ink-soft); font-size: 15.5px; }
+  .note p + p { margin-top: 12px; }
+
+  footer.site { padding: 40px 0 56px; color: var(--ink-faint); font-size: 14.5px; }
+  footer.site .row { display: flex; flex-wrap: wrap; gap: 18px; justify-content: space-between; align-items: center; }
+</style>
+</head>
+<body>
+
+<header class="site">
+  <div class="wrap">
+    <div class="brand"><span class="dot"></span>SupplyChainIntel</div>
+    <nav class="top">
+      <a href="#overview">Overview</a>
+      <a href="#architecture" class="hide-sm">Architecture</a>
+      <a href="#features" class="hide-sm">Features</a>
+      <a href="#status">Status</a>
+      <a href="https://github.com/rs1990/supply-chain-intel" rel="noopener">GitHub</a>
+    </nav>
+  </div>
+</header>
+
+<div class="hero">
+  <div class="wrap">
+    <span class="eyebrow">Operations analytics</span>
+    <h1>Eight source systems, one operating picture.</h1>
+    <p class="lede">SupplyChainIntel pulls from SAP, Ariba, CDK, Manhattan, Snowflake, freight, warranty, and demand systems on a 15 minute cycle, normalizes everything into a common schema, and computes the daily and weekly numbers a supply chain team actually runs on: fill rate, on-time delivery, production attainment, freight exceptions, inventory turns, and forecast error.</p>
+    <div class="cta">
+      <a class="btn" href="https://github.com/rs1990/supply-chain-intel" rel="noopener">View source</a>
+      <a class="btn ghost" href="#overview">How it works</a>
+    </div>
+    <div class="stats">
+      <div class="stat"><div class="v">13</div><div class="k">daily KPIs computed at 6am</div></div>
+      <div class="stat"><div class="v">8</div><div class="k">connected source systems</div></div>
+      <div class="stat"><div class="v">14 days</div><div class="k">forward demand forecast</div></div>
+      <div class="stat"><div class="v">z &gt; 3.0</div><div class="k">critical warranty anomaly</div></div>
+    </div>
+  </div>
+</div>
+
+<section id="overview">
+  <div class="wrap">
+    <h2>What it does</h2>
+    <p class="sub">Ingest, normalize, compute, alert.</p>
+    <p class="body">Every 15 minutes the ingestion pipeline calls each connector&#x27;s seven pull methods and upserts the results into eight raw tables with conflict resolution. At 6am a metrics job reads a 7 to 30 day window and writes 13 KPIs into a daily metrics table alongside a connector log. On Monday at 7am a weekly job aggregates those dailies plus supplier, freight, and warranty performance into weekly rollups.</p>
+    <p class="body">Five thresholds drive alerting: fill rate below 95 percent, supplier on-time delivery below 90 percent, production attainment below 95 percent, freight on-time below 92 percent, and more than five freight exceptions in the trailing week. Each breach becomes a structured alert attached to the day&#x27;s metric row rather than a fire-and-forget notification.</p>
+    <p class="body">Two analytical jobs run on demand. Warranty anomaly detection z-scores 60 days of claim history per part against the trailing 7 days, flagging at 2.0 and escalating at 3.0. Demand forecasting blends a linear trend at 40 percent with a 7 day moving average at 60 percent and applies a 0.3 weekend factor, producing a 14 day forward view per part and region.</p>
+    <p class="body">A BaseConnector abstract class maps every heterogeneous enterprise API onto the same seven-method interface, so a connector can be swapped or added without touching the pipeline. The mock connector implements that interface with seeded stochastic data, which means the whole platform runs and demonstrates with no enterprise credentials at all.</p>
+  </div>
+</section>
+
+<section id="architecture">
+  <div class="wrap">
+    <h2>Architecture</h2>
+    <p class="sub">A FastAPI service that ingests, computes, and serves its own frontend.</p>
+    <pre class="diagram">  SAP  Ariba  CDK  Manhattan  Snowflake  TMS  Warranty  Demand
+   |     |     |      |           |        |      |         |
+   +-----+-----+------+-----+-----+--------+------+---------+
+                            |
+                    BaseConnector (7 pull methods)
+                            |
+                            v
+              ingestion/pipeline.py   every 15 min
+                            |  upsert with conflict resolution
+                            v
+                8 raw tables  (SQLAlchemy ORM)
+                            |
+        +-------------------+--------------------+
+        |                   |                    |
+        v                   v                    v
+  metrics/daily.py    metrics/weekly.py      ml/anomaly.py
+  13 KPIs, 6am        12 aggregates, Mon     z-score, 60d
+  5 alert rules       inventory turns        ml/forecast.py
+        |                   |                 14d, trend + MA
+        +-------------------+--------------------+
+                            |
+                            v
+              FastAPI  -&gt;  11 endpoints  -&gt;  React + Recharts</pre>
+  </div>
+</section>
+
+<section id="features">
+  <div class="wrap">
+    <h2>Engineering details</h2>
+    <p class="sub">The decisions that carry the design.</p>
+    <div class="cards">
+      <div class="card"><span class="n">01</span><h3>Uniform connector interface</h3><p>A BaseConnector abstract base class maps SAP OData, Ariba, CDK, Manhattan, and Snowflake onto the same seven pull methods. Adding or replacing a source system never touches pipeline code.</p></div>
+      <div class="card"><span class="n">02</span><h3>Realistic synthetic mode</h3><p>The mock connector generates about 950 records per run with seeded stochastic variance: a 12 percent purchase order late rate, an 8 percent freight late rate, and a deliberate 25 percent systemic spike on one turbocharger part so the anomaly detector has something real to find.</p></div>
+      <div class="card"><span class="n">03</span><h3>Blended forecasting</h3><p>Demand is projected as 40 percent linear trend plus 60 percent seven-day moving average with a 0.3 weekend factor, per part and region, rather than by a single naive method.</p></div>
+      <div class="card"><span class="n">04</span><h3>Statistical anomaly detection</h3><p>Warranty claims are z-scored against a 60 day per-part baseline, flagging at 2.0 and escalating to critical at 3.0, which surfaces systemic component failures before they show up in cost totals.</p></div>
+      <div class="card"><span class="n">05</span><h3>Threshold alerting in the metric row</h3><p>Five configurable thresholds produce structured alerts stored alongside the day&#x27;s computed metrics, so any historical day can be replayed with the alerts it actually raised.</p></div>
+      <div class="card"><span class="n">06</span><h3>Scheduler and lifespan separation</h3><p>APScheduler owns the 15 minute, daily, and weekly jobs while the FastAPI lifespan handles startup ingestion and metric computation, keeping background work independent of request handling.</p></div>
+      <div class="card"><span class="n">07</span><h3>Typed frontend client</h3><p>A single typed fetch client exposes 11 API methods to the React frontend, which renders KPI cards, Recharts time series, an anomalies table, and supplier and carrier performance tables.</p></div>
+      <div class="card"><span class="n">08</span><h3>CSV bulk upload</h3><p>Inventory snapshots can be loaded over HTTP multipart with required columns validated up front: part number, location, quantity on hand, and snapshot date.</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="numbers">
+  <div class="wrap">
+    <h2>Numbers from the code</h2>
+    <p class="sub">Measured or configured values, not projections.</p>
+    <ul class="facts">
+      <li>11 API endpoints: 10 metrics, 1 manual compute, plus ingest and CSV upload</li>
+      <li>13 database tables: 8 raw plus daily, weekly, and connector log</li>
+      <li>About 950 synthetic records generated per ingestion run</li>
+      <li>13 daily KPIs and 12 weekly aggregates</li>
+      <li>5 alerting thresholds, all configurable</li>
+      <li>60 day anomaly lookback, z 2.0 warning and 3.0 critical</li>
+      <li>14 day forecast horizon per part and region</li>
+      <li>Inventory turns computed as COGS over average inventory times 52</li>
+      <li>30 day on-time delivery tracked by supplier and by carrier</li>
+      <li>SAP S/4HANA OData v4 with OAuth2 token management</li>
+      <li>Ingestion cycle: 15 minutes. Daily metrics: 6am. Weekly: Monday 7am</li>
+      <li>900 line synthetic data generator backing the demo mode</li>
+    </ul>
+  </div>
+</section>
+
+<section id="stack">
+  <div class="wrap">
+    <h2>Stack</h2>
+    <p class="sub">Python service, React dashboard, one deployable unit.</p>
+    <div class="stack">
+      <span class="chip">FastAPI 0.111</span>
+      <span class="chip">SQLAlchemy 2.0</span>
+      <span class="chip">Uvicorn</span>
+      <span class="chip">APScheduler 3.10</span>
+      <span class="chip">pandas 2.2</span>
+      <span class="chip">scikit-learn 1.4</span>
+      <span class="chip">numpy 1.26</span>
+      <span class="chip">Pydantic 2.7</span>
+      <span class="chip">React 19</span>
+      <span class="chip">TypeScript</span>
+      <span class="chip">Vite</span>
+      <span class="chip">Tailwind</span>
+      <span class="chip">Recharts</span>
+      <span class="chip">PostgreSQL / SQLite</span>
+      <span class="chip">Render</span>
+    </div>
+  </div>
+</section>
+
+<section id="status">
+  <div class="wrap">
+    <h2>Status</h2>
+    <p class="sub">An honest account of what is built and what is not.</p>
+    <div class="note">
+      <p>MVP. The ingestion pipeline, metric computation, alerting, anomaly detection, and forecasting all work end to end and the service deploys on Render as a single unit that serves its own frontend.</p>
+      <p>Incomplete and stated as such: there is no test suite, the SAP connector is half implemented with freight, warranty, and demand paths returning empty lists, Slack alerting exists in configuration but has no routes wired, PDF and Excel export are not built, and the API has no authentication or role-based access control.</p>
+      <p>The mock connector is not a placeholder for missing work, it is the demo path. Running with USE_MOCK_DATA enabled exercises every metric, alert, anomaly, and forecast without a single enterprise credential.</p>
+    </div>
+  </div>
+</section>
+
+<footer class="site">
+  <div class="wrap">
+    <div class="row">
+      <div>SupplyChainIntel. Built by Raghavendra. Open source.</div>
+      <div><a href="https://github.com/rs1990/supply-chain-intel" rel="noopener">github.com/rs1990/supply-chain-intel</a></div>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>
